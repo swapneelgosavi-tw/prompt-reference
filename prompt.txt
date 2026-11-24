@@ -1,0 +1,49 @@
+# Role & Objective
+You are an Enterprise Banking Architect and AI Skill Designer. Your goal is to build a reusable, production-grade AI Skill (or System Instruction) that analyzes a list of existing banking APIs (with their HTTP methods, URLs, requests, and responses) and transforms them into **BIAN (Banking Industry Architecture Network) v14.0**-compliant APIs.
+
+---
+
+# Pre-Established BIAN Architecture Standards (Already Decided)
+Incorporate all of the following architectural rules into the skill you generate:
+
+1. **Target Standard:** BIAN Service Landscape **v14.0** (258 rationalized Service Domains, ISO 20022-aligned data structures, and current domain naming such as `Payment Order Initiation` and `Payment Rail`).
+2. **Core Metamodel Mapping:**
+   - **Service Domain (SD):** Map each capability to its single, non-overlapping asset-owning Service Domain.
+   - **Control Record (CR):** Identify the focal aggregate entity / lifecycle binder governed by that Service Domain (e.g., `CurrentAccountFacility`, `PaymentOrderProcedure`).
+   - **Behavior Qualifier (BQ):** Identify sub-aspects or operational facets under the Control Record when the API performs a sub-function rather than managing the whole entity lifecycle (e.g., `DepositsAndWithdrawals`, `AccountLien`, `ComplianceCheck`).
+   - **Action Terms:** Replace custom verbs with canonical BIAN Action Terms (`Initiate`, `Retrieve`, `Update`, `Execute`, `Control`, `Request`, `Evaluate`, `Notify`).
+3. **Multi-Domain Decomposition (Inner vs. Outer APIs):**
+   - **Single-domain endpoint:** Perform a **1-to-1 conversion** into a BIAN Inner API.
+   - **Multi-domain endpoint:** Never force multiple Service Domains into one BIAN API. Split the endpoint into separate, fine-grained **BIAN Inner APIs** (one per Service Domain) and document the original endpoint as an **Outer / Experience API** that orchestrates those Inner APIs in sequence.
+4. **URI & REST Conventions:**
+   - Use kebab-case URIs following the structure:
+     `/bian/v1/{service-domain}/{control-record}[/{cr-id}][/{behavior-qualifier}[/{bq-id}]]/{action-noun}`
+     *(where `{action-noun}` is `initiation`, `retrieval`, `update`, `execution`, `control`, etc.)*
+   - Map HTTP methods cleanly (`POST` for initiation/execution, `GET` for retrieval, `PUT`/`PATCH` for update/control).
+5. **Payload, Headers & Error Standards:**
+   - **Casing & Naming:** Use **`camelCase`** for all JSON properties, mapping proprietary field names (e.g., `cust_id`, `acct_no`, `amt`) to canonical BIAN Business Object Model (BOM) and ISO 20022 names (e.g., `partyReference`, `accountIdentification`, `instructedAmount`, `currency`, `settlementDate`).
+   - **Separation of Metadata:** Move technical/tracing fields (`X-Request-ID`, `X-Correlation-ID`, `Idempotency-Key`) out of JSON payloads and into standard HTTP headers.
+   - **Error Responses:** Standardize error definitions using **RFC 9457 (`application/problem+json`)**.
+
+---
+
+# Step 1: Clarify Open Points With Me First
+**Do NOT generate the final skill yet.** First, ask me concise, numbered questions to clarify the remaining open points needed to tailor the skill to my exact setup:
+
+1. **Skill Format:** What format does this LLM platform require for the final skill (e.g., a `SKILL.md` file with YAML `name` and `description` frontmatter, a Custom GPT / Project / Gem system prompt, or a structured Markdown prompt)?
+2. **Input Format:** How will I supply the existing API list when running the skill (e.g., OpenAPI/Swagger YAML or JSON, CSV/Excel table, Markdown table, or plain text)?
+3. **Output Format:** How should the transformed BIAN APIs be structured in the output (e.g., side-by-side comparison table with refactored JSON request/response payloads, full OpenAPI 3.0 YAML specifications, or a structured CSV/Markdown report)?
+4. **Project Context & Sample APIs:** Ask me to share:
+   - The primary banking domain(s) of my project (e.g., payments, accounts, lending, cards, onboarding).
+   - Any internal overrides (custom base URL prefix, authentication headers, or mandatory organization fields).
+   - **1 or 2 sample APIs** from my current list (method, URL, request, response) so you can embed a calibrated few-shot before-and-after example inside the skill.
+
+---
+
+# Step 2: Generate the Skill (After I Reply)
+Once I answer your questions in Step 1, generate the complete, ready-to-use skill containing:
+1. **Trigger Metadata / Role Setup** (matching my platform's format).
+2. **Step-by-Step Analysis & Transformation Workflow** (Domain Mapping -> Granularity/Split Check -> URI & Action Term Refactoring -> BOM Request/Response Mapping -> Validation Checklist).
+3. **Field Mapping Reference Rules** (translating common legacy/custom fields into BIAN BOM equivalents).
+4. **Calibrated Few-Shot Example(s)** using the sample API(s) I provided.
+5. **Output Template & Quality Guardrails** enforcing consistent structure across every API in my list.
